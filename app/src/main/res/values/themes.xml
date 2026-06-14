@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.YTDownloaderPro" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">#3b82f6</item>
+        <item name="colorPrimaryDark">#1e3a8a</item>
+        <item name="colorAccent">#10b981</item>
+        <item name="android:statusBarColor">#0a0e1a</item>
+        <item name="android:navigationBarColor">#0a0e1a</item>
+        <item name="android:windowBackground">#0a0e1a</item>
+        <item name="android:textColorPrimary">#f1f5f9</item>
+        <item name="android:textColorSecondary">#94a3b8</item>
+    </style>
+
+    <style name="Theme.YTDownloaderPro.Dark" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">#3b82f6</item>
+        <item name="colorPrimaryDark">#1e3a8a</item>
+        <item name="colorAccent">#10b981</item>
+        <item name="android:statusBarColor">#0a0e1a</item>
+        <item name="android:navigationBarColor">#0a0e1a</item>
+        <item name="android:windowBackground">#0a0e1a</item>
+        <item name="android:textColorPrimary">#f1f5f9</item>
+        <item name="android:textColorSecondary">#94a3b8</item>
+    </style>
+</resources>
