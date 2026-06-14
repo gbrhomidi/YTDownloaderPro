@@ -1,0 +1,8 @@
+
+*.apk
+*.aab
+build/
+.gradle/
+app/src/main/assets/yt-dlp
+app/src/main/assets/ffmpeg
+

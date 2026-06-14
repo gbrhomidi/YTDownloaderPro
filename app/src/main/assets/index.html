@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>📥 YouTube Downloader Pro</title>
+<style>
+/* ════════════════════════════════════════════
+   YouTube Downloader Pro - APK Edition
+   Single HTML File - Android WebView Ready
+   ════════════════════════════════════════════ */
+
+:root {
+  --bg-primary: #0a0e1a;
+  --bg-secondary: #111827;
+  --bg-card: #151b2d;
+  --bg-input: #0f1525;
+  --bg-hover: #1e293b;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --primary: #3b82f6;
+  --primary-hover: #2563eb;
+  --primary-light: rgba(59,130,246,0.15);
+  --success: #10b981;
+  --success-light: rgba(16,185,129,0.15);
+  --warning: #f59e0b;
+  --warning-light: rgba(245,158,11,0.15);
+  --danger: #ef4444;
+  --danger-light: rgba(239,68,68,0.15);
+  --info: #06b6d4;
+  --info-light: rgba(6,182,212,0.15);
+  --border: rgba(255,255,255,0.08);
+  --border-hover: rgba(255,255,255,0.15);
+  --shadow: 0 4px 6px rgba(0,0,0,0.4);
+  --shadow-lg: 0 10px 25px rgba(0,0,0,0.5);
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+[data-theme="light"] {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #f1f5f9;
+  --bg-card: #ffffff;
+  --bg-input: #f8fafc;
+  --bg-hover: #e2e8f0;
+  --text-primary: #1e293b;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --border: rgba(0,0,0,0.08);
+  --border-hover: rgba(0,0,0,0.15);
+  --shadow: 0 4px 6px rgba(0,0,0,0.1);
+  --shadow-lg: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Arial,sans-serif}
+html{scroll-behavior:smooth}
+body{background:var(--bg-primary);color:var(--text-primary);min-height:100vh;overflow-x:hidden;transition:all .3s ease}
+
+.app{display:flex;min-height:100vh}
+
+/* Sidebar */
+.sidebar{width:260px;background:var(--bg-secondary);border-left:1px solid var(--border);display:flex;flex-direction:column;position:fixed;right:0;top:0;height:100vh;z-index:100;transition:width .3s ease;overflow:hidden}
+.sidebar.collapsed{width:70px}
+.sidebar-header{padding:20px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.logo{display:flex;align-items:center;gap:10px;white-space:nowrap}
+.logo-icon{font-size:28px;min-width:40px;text-align:center}
+.logo-text{font-size:1.1rem;font-weight:700;color:var(--text-primary);transition:opacity .3s}
+.sidebar.collapsed .logo-text{opacity:0;width:0}
+.sidebar-toggle{background:none;border:none;color:var(--text-secondary);font-size:20px;cursor:pointer;padding:4px;border-radius:8px;transition:all .15s}
+.sidebar-toggle:hover{background:var(--bg-hover);color:var(--text-primary)}
+.sidebar-nav{flex:1;padding:16px 12px;display:flex;flex-direction:column;gap:4px;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:var(--radius);color:var(--text-secondary);text-decoration:none;transition:all .15s;position:relative;white-space:nowrap}
+.nav-item:hover{background:var(--bg-hover);color:var(--text-primary)}
+.nav-item.active{background:var(--primary-light);color:var(--primary);font-weight:600}
+.nav-item.active::before{content:'';position:absolute;right:0;top:50%;transform:translateY(-50%);width:3px;height:24px;background:var(--primary);border-radius:2px}
+.nav-icon{font-size:20px;min-width:28px;text-align:center}
+.nav-text{font-size:.95rem;transition:opacity .3s}
+.sidebar.collapsed .nav-text{display:none}
+.nav-badge{background:var(--danger);color:white;font-size:11px;padding:2px 8px;border-radius:10px;margin-right:auto;min-width:20px;text-align:center;display:none}
+.nav-badge.show{display:flex}
+.sidebar-footer{padding:16px;border-top:1px solid var(--border)}
+.server-status{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--warning);animation:pulse 2s infinite}
+.status-dot.online{background:var(--success);animation:none}
+.status-dot.offline{background:var(--danger);animation:none}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.status-text{font-size:12px;color:var(--text-muted)}
+.app-version{font-size:11px;color:var(--text-muted);text-align:center}
+
+/* Main */
+.main{flex:1;margin-right:260px;padding:24px 32px;min-height:100vh;transition:margin-right .3s}
+.sidebar.collapsed + .main{margin-right:70px}
+.top-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.page-title{font-size:1.5rem;font-weight:700}
+.theme-btn{width:40px;height:40px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .15s}
+.theme-btn:hover{background:var(--bg-hover);color:var(--text-primary);transform:scale(1.05)}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;display:flex;align-items:center;gap:14px;transition:all .15s}
+.stat-card:hover{border-color:var(--border-hover);transform:translateY(-2px);box-shadow:var(--shadow)}
+.stat-icon{font-size:28px;width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:var(--primary-light);border-radius:var(--radius-sm)}
+.stat-value{font-size:1.6rem;font-weight:700;line-height:1.2}
+.stat-label{font-size:.85rem;color:var(--text-muted);margin-top:2px}
+
+/* Cards */
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;transition:all .15s}
+.card:hover{border-color:var(--border-hover)}
+.card-header{margin-bottom:20px}
+.card-header h2{font-size:1.15rem;font-weight:600;margin-bottom:4px}
+.card-desc{font-size:.85rem;color:var(--text-muted)}
+.card-header.flex-between{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.content-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+
+/* Form */
+.form-section{display:flex;flex-direction:column;gap:18px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.input-group{display:flex;flex-direction:column;gap:6px}
+.input-group label{font-size:.85rem;font-weight:500;color:var(--text-secondary)}
+.input-wrapper{display:flex;gap:8px}
+.input-wrapper input{flex:1}
+input,select{padding:12px 14px;border-radius:var(--radius);border:2px solid var(--border);background:var(--bg-input);color:var(--text-primary);font-size:14px;transition:all .15s;outline:none;width:100%}
+input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--primary-light)}
+input::placeholder{color:var(--text-muted)}
+.input-action{padding:12px 14px;border-radius:var(--radius);border:2px solid var(--border);background:var(--bg-hover);color:var(--text-secondary);cursor:pointer;font-size:16px;transition:all .15s;white-space:nowrap}
+.input-action:hover{background:var(--bg-hover);color:var(--text-primary);border-color:var(--border-hover)}
+.input-hint{font-size:12px;color:var(--text-muted);margin-top:2px}
+
+/* Toggle */
+.toggle-switch{position:relative;display:inline-block;width:48px;height:26px;cursor:pointer}
+.toggle-switch input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;top:0;left:0;right:0;bottom:0;background:var(--bg-hover);border-radius:26px;transition:.15s;border:2px solid var(--border)}
+.toggle-slider::before{content:'';position:absolute;height:18px;width:18px;left:3px;bottom:2px;background:var(--text-secondary);border-radius:50%;transition:.15s}
+.toggle-switch input:checked + .toggle-slider{background:var(--primary-light);border-color:var(--primary)}
+.toggle-switch input:checked + .toggle-slider::before{transform:translateX(22px);background:var(--primary)}
+.checkbox-row{display:flex;align-items:center;gap:12px;padding:12px 0}
+.toggle-label{font-size:.9rem;color:var(--text-secondary)}
+
+/* Range */
+.range-input{display:flex;align-items:center;gap:12px}
+.range-input input[type="range"]{flex:1;-webkit-appearance:none;height:6px;border-radius:3px;background:var(--bg-hover);outline:none;padding:0;border:none}
+.range-input input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--primary);cursor:pointer;box-shadow:var(--shadow)}
+.range-value{font-size:1rem;font-weight:600;color:var(--primary);min-width:24px;text-align:center}
+
+/* Buttons */
+.btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary-hover));color:white;border:none;padding:14px 24px;border-radius:var(--radius);font-size:.95rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:all .15s;box-shadow:var(--shadow)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 20px rgba(59,130,246,0.3)}
+.btn-primary:active{transform:translateY(0)}
+.btn-primary:disabled{background:var(--text-muted);cursor:not-allowed;transform:none;box-shadow:none}
+.btn-large{padding:16px 32px;font-size:1rem;width:100%}
+.btn-secondary{background:var(--bg-hover);color:var(--text-secondary);border:1px solid var(--border);padding:12px 20px;border-radius:var(--radius);font-size:.9rem;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:all .15s}
+.btn-secondary:hover{background:var(--bg-hover);color:var(--text-primary);border-color:var(--border-hover)}
+.btn-icon-btn{width:36px;height:36px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg-hover);color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .15s}
+.btn-icon-btn:hover{background:var(--bg-hover);color:var(--text-primary)}
+.btn-icon-btn.danger:hover{background:var(--danger-light);color:var(--danger);border-color:var(--danger)}
+.header-actions-group{display:flex;gap:8px}
+
+/* Progress */
+.progress-section{display:flex;flex-direction:column;gap:16px}
+.video-preview{background:var(--bg-hover);border-radius:var(--radius);aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.preview-placeholder{display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--text-muted)}
+.preview-icon{font-size:48px}
+.preview-text{font-size:.85rem}
+.progress-info-bar{text-align:center}
+.progress-title{font-size:1rem;font-weight:600;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.progress-meta{display:flex;justify-content:center;gap:16px;font-size:.8rem;color:var(--text-muted)}
+.progress-bar-bg{height:24px;background:var(--bg-hover);border-radius:12px;overflow:hidden;position:relative;border:1px solid var(--border)}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--success));border-radius:12px;transition:width .5s ease;display:flex;align-items:center;justify-content:flex-end;padding-right:10px;min-width:40px;position:relative;overflow:hidden}
+.progress-bar-fill::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);animation:shimmer 2s infinite}
+@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.progress-percent{color:white;font-weight:700;font-size:12px;text-shadow:0 1px 2px rgba(0,0,0,0.3);z-index:1}
+.progress-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.progress-stat{display:flex;align-items:center;gap:8px;padding:10px;background:var(--bg-hover);border-radius:var(--radius);font-size:.85rem;color:var(--text-secondary)}
+.progress-actions{display:flex;justify-content:center;gap:12px}
+
+.status-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:.8rem;font-weight:500}
+.status-pending{background:var(--warning-light);color:var(--warning)}
+.status-downloading{background:var(--primary-light);color:var(--primary)}
+.status-completed{background:var(--success-light);color:var(--success)}
+.status-error{background:var(--danger-light);color:var(--danger)}
+.status-cancelled{background:var(--bg-hover);color:var(--text-muted)}
+.status-compressing{background:var(--info-light);color:var(--info)}
+
+/* Completed Files */
+.completed-files{border-top:1px solid var(--border);padding-top:16px;display:none}
+.completed-files h3{font-size:.9rem;color:var(--text-secondary);margin-bottom:12px}
+.files-list{display:flex;flex-direction:column;gap:8px}
+.file-item{display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg-hover);border-radius:var(--radius);border:1px solid var(--border);transition:all .15s}
+.file-item:hover{border-color:var(--primary);background:var(--bg-hover)}
+.file-icon{font-size:24px}
+.file-info{flex:1;min-width:0}
+.file-name{font-size:.85rem;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-meta{font-size:.75rem;color:var(--text-muted);margin-top:2px}
+.file-actions{display:flex;gap:6px}
+.file-btn{padding:6px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);font-size:.75rem;cursor:pointer;transition:all .15s;white-space:nowrap}
+.file-btn:hover{background:var(--primary);color:white;border-color:var(--primary)}
+
+/* Quick Paths */
+.quick-paths-card{margin-bottom:20px}
+.section-title{font-size:.9rem;color:var(--text-secondary);margin-bottom:12px}
+.quick-paths{display:flex;flex-wrap:wrap;gap:10px}
+.path-chip{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-secondary);font-size:.85rem;cursor:pointer;transition:all .15s}
+.path-chip:hover{background:var(--primary-light);color:var(--primary);border-color:var(--primary);transform:translateY(-1px)}
+.path-chip.active{background:var(--primary);color:white;border-color:var(--primary)}
+
+/* Compression */
+.compression-section{background:var(--bg-hover);border-radius:var(--radius);padding:16px;border:1px solid var(--border)}
+.compression-options{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:none}
+.compression-info{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px;padding:12px;background:var(--bg-card);border-radius:var(--radius-sm)}
+.compression-info .info-item{text-align:center}
+.compression-info .info-label{display:block;font-size:.75rem;color:var(--text-muted);margin-bottom:4px}
+.compression-info .info-value{font-size:.9rem;font-weight:600}
+
+/* Tasks */
+.tasks-filter{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.filter-btn{padding:8px 16px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg-hover);color:var(--text-secondary);font-size:.85rem;cursor:pointer;transition:all .15s}
+.filter-btn:hover{background:var(--bg-hover);color:var(--text-primary)}
+.filter-btn.active{background:var(--primary);color:white;border-color:var(--primary)}
+.tasks-container{display:flex;flex-direction:column;gap:12px;max-height:600px;overflow-y:auto;padding-right:4px}
+.task-card{background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius);padding:16px;transition:all .15s;position:relative;overflow:hidden}
+.task-card:hover{border-color:var(--border-hover);transform:translateX(-4px)}
+.task-card::before{content:'';position:absolute;right:0;top:0;bottom:0;width:4px;border-radius:0 var(--radius) var(--radius) 0}
+.task-card.status-pending::before{background:var(--warning)}
+.task-card.status-downloading::before{background:var(--primary)}
+.task-card.status-completed::before{background:var(--success)}
+.task-card.status-error::before{background:var(--danger)}
+.task-card.status-cancelled::before{background:var(--text-muted)}
+.task-card.status-compressing::before{background:var(--info)}
+.task-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:12px}
+.task-title{font-weight:600;font-size:.9rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.task-meta{display:flex;flex-wrap:wrap;gap:12px;font-size:.8rem;color:var(--text-muted);margin-bottom:12px}
+.task-progress{margin-bottom:12px}
+.task-progress-bar{height:6px;background:var(--bg-card);border-radius:3px;overflow:hidden;margin-bottom:6px}
+.task-progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--success));border-radius:3px;transition:width .5s ease}
+.task-progress-info{display:flex;justify-content:space-between;font-size:.75rem;color:var(--text-muted)}
+.task-actions{display:flex;gap:8px}
+.task-btn{padding:6px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);font-size:.8rem;cursor:pointer;transition:all .15s}
+.task-btn:hover{background:var(--bg-hover);color:var(--text-primary)}
+.task-btn.danger:hover{background:var(--danger-light);color:var(--danger);border-color:var(--danger)}
+
+/* Empty State */
+.empty-state{text-align:center;padding:60px 20px;color:var(--text-muted)}
+.empty-icon{font-size:64px;margin-bottom:16px;opacity:.5}
+.empty-title{font-size:1.1rem;font-weight:600;color:var(--text-secondary);margin-bottom:8px}
+.empty-desc{font-size:.85rem}
+
+/* Settings */
+.settings-section{display:flex;flex-direction:column;gap:24px}
+.setting-item{display:flex;flex-direction:column;gap:10px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.setting-item:last-child{border-bottom:none;padding-bottom:0}
+.setting-info{display:flex;flex-direction:column;gap:2px}
+.setting-label{font-size:.9rem;font-weight:500;color:var(--text-primary)}
+.setting-desc{font-size:.8rem;color:var(--text-muted)}
+.theme-selector{display:flex;gap:10px;flex-wrap:wrap}
+.theme-option{display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 24px;background:var(--bg-hover);border:2px solid var(--border);border-radius:var(--radius);color:var(--text-secondary);cursor:pointer;transition:all .15s;min-width:80px}
+.theme-option:hover{border-color:var(--border-hover);background:var(--bg-hover)}
+.theme-option.active{border-color:var(--primary);background:var(--primary-light);color:var(--primary)}
+.theme-option span:first-child{font-size:24px}
+.theme-option span:last-child{font-size:.8rem;font-weight:500}
+.info-section{display:flex;flex-direction:column;gap:14px}
+.info-section .info-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+.info-section .info-item:last-child{border-bottom:none}
+.info-section .info-label{font-size:.85rem;color:var(--text-secondary)}
+.info-section .info-value{font-size:.85rem;font-weight:600;color:var(--text-primary)}
+.system-actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+
+/* Toast */
+.toast-container{position:fixed;top:24px;left:24px;z-index:1000;display:flex;flex-direction:column;gap:10px;pointer-events:none}
+.toast{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 20px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-lg);animation:toastIn .3s ease;pointer-events:all;max-width:400px;min-width:300px}
+.toast.removing{animation:toastOut .3s ease forwards}
+.toast-icon{font-size:20px;min-width:24px}
+.toast-content{flex:1}
+.toast-title{font-size:.9rem;font-weight:600;margin-bottom:2px}
+.toast-message{font-size:.8rem;color:var(--text-secondary)}
+.toast-close{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px;padding:4px;transition:color .15s}
+.toast-close:hover{color:var(--text-primary)}
+.toast-success{border-right:4px solid var(--success)}
+.toast-error{border-right:4px solid var(--danger)}
+.toast-warning{border-right:4px solid var(--warning)}
+.toast-info{border-right:4px solid var(--primary)}
+@keyframes toastIn{from{transform:translateX(-100%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes toastOut{from{transform:translateX(0);opacity:1}to{transform:translateX(-100%);opacity:0}}
+
+/* Modal */
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;visibility:hidden;transition:all .3s}
+.modal-overlay.active{opacity:1;visibility:visible}
+.modal{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);width:90%;max-width:500px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;transform:scale(0.9);transition:transform .3s}
+.modal-overlay.active .modal{transform:scale(1)}
+.modal-large{max-width:600px}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border)}
+.modal-header h3{font-size:1.1rem;font-weight:600}
+.modal-close{background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer;padding:4px;transition:color .15s}
+.modal-close:hover{color:var(--danger)}
+.modal-body{padding:24px;overflow-y:auto;flex:1}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;padding:16px 24px;border-top:1px solid var(--border)}
+
+/* Path Picker */
+.path-breadcrumb{padding:10px 14px;background:var(--bg-hover);border-radius:var(--radius-sm);font-size:.85rem;color:var(--text-secondary);margin-bottom:16px;font-family:monospace;overflow-x:auto;white-space:nowrap}
+.path-list{display:flex;flex-direction:column;gap:4px;max-height:300px;overflow-y:auto}
+.path-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--radius-sm);cursor:pointer;transition:all .15s;color:var(--text-secondary)}
+.path-item:hover{background:var(--bg-hover);color:var(--text-primary)}
+.path-item-icon{font-size:18px}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--text-muted);border-radius:3px;opacity:.5}
+::-webkit-scrollbar-thumb:hover{background:var(--text-secondary)}
+
+/* Tab Content */
+.tab-content{display:none;animation:fadeIn .3s ease}
+.tab-content.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* Spinner */
+.spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Responsive */
+@media(max-width:1024px){
+  .content-grid{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:768px){
+  .sidebar{width:70px}
+  .sidebar .logo-text,.sidebar .nav-text,.sidebar .nav-badge{display:none}
+  .main{margin-right:70px;padding:16px}
+  .stats{grid-template-columns:repeat(2,1fr);gap:10px}
+  .stat-card{padding:14px}
+  .stat-icon{font-size:22px;width:40px;height:40px}
+  .stat-value{font-size:1.3rem}
+  .form-row{grid-template-columns:1fr}
+  .progress-stats{grid-template-columns:1fr}
+  .page-title{font-size:1.2rem}
+  .tasks-filter{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px}
+  .compression-info{grid-template-columns:1fr}
+  .theme-selector{justify-content:center}
+  .system-actions{flex-direction:column}
+  .system-actions .btn-secondary{width:100%}
+}
+@media(max-width:480px){
+  .main{padding:12px}
+  .card{padding:16px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .task-header{flex-direction:column;gap:8px}
+  .task-actions{width:100%}
+  .task-btn{flex:1}
+  .toast-container{left:12px;right:12px;top:12px}
+  .toast{max-width:100%;min-width:auto}
+  .modal{width:95%}
+  .quick-paths{justify-content:center}
+  .path-chip{font-size:.8rem;padding:8px 12px}
+}
+
+/* APK Info Banner */
+.apk-info{background:var(--info-light);border:1px solid var(--info);border-radius:var(--radius);padding:16px;margin-bottom:20px;display:flex;align-items:center;gap:12px}
+.apk-info-icon{font-size:24px}
+.apk-info-text{flex:1}
+.apk-info-title{font-weight:600;color:var(--info);margin-bottom:2px}
+.apk-info-desc{font-size:.85rem;color:var(--text-secondary)}
+</style>
+</head>
+<body data-theme="dark">
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo"><span class="logo-icon">📥</span><span class="logo-text">YT Downloader</span></div>
+      <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active" data-tab="download" onclick="switchTab('download')">
+        <span class="nav-icon">⬇️</span><span class="nav-text">تنزيل</span>
+      </a>
+      <a href="#" class="nav-item" data-tab="tasks" onclick="switchTab('tasks')">
+        <span class="nav-icon">📋</span><span class="nav-text">المهام</span>
+        <span class="nav-badge" id="tasksBadge">0</span>
+      </a>
+      <a href="#" class="nav-item" data-tab="history" onclick="switchTab('history')">
+        <span class="nav-icon">📜</span><span class="nav-text">السجل</span>
+      </a>
+      <a href="#" class="nav-item" data-tab="settings" onclick="switchTab('settings')">
+        <span class="nav-icon">⚙️</span><span class="nav-text">إعدادات</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="server-status"><span class="status-dot" id="serverStatus"></span><span class="status-text" id="serverStatusText">جاري الفحص...</span></div>
+      <div class="app-version">v2.0 APK</div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+    <header class="top-header">
+      <h1 class="page-title" id="pageTitle">⬇️ تنزيل جديد</h1>
+      <div class="header-actions">
+        <button class="theme-btn" onclick="toggleTheme()" title="تبديل المظهر"><span id="themeIcon">🌙</span></button>
+      </div>
+    </header>
+
+    <!-- APK Info Banner -->
+    <div class="apk-info" id="apkInfo">
+      <span class="apk-info-icon">📱</span>
+      <div class="apk-info-text">
+        <div class="apk-info-title">وضع APK نشط</div>
+        <div class="apk-info-desc" id="apkStatus">جاري التحقق من yt-dlp...</div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-card"><div class="stat-icon">⚡</div><div class="stat-info"><div class="stat-value" id="activeCount">0</div><div class="stat-label">نشط</div></div></div>
+      <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-info"><div class="stat-value" id="completedCount">0</div><div class="stat-label">مكتمل</div></div></div>
+      <div class="stat-card"><div class="stat-icon">⏳</div><div class="stat-info"><div class="stat-value" id="queueCount">0</div><div class="stat-label">انتظار</div></div></div>
+      <div class="stat-card"><div class="stat-icon">📊</div><div class="stat-info"><div class="stat-value" id="totalCount">0</div><div class="stat-label">إجمالي</div></div></div>
+    </div>
+
+    <!-- Download Tab -->
+    <div class="tab-content active" id="download-tab">
+      <div class="content-grid">
+        <div class="card main-card">
+          <div class="card-header"><h2>🔗 رابط الفيديو</h2><p class="card-desc">أدخل رابط YouTube لبدء التنزيل</p></div>
+          <div class="form-section">
+            <div class="input-group">
+              <label for="urlInput">🔗 رابط YouTube</label>
+              <div class="input-wrapper">
+                <input type="url" id="urlInput" placeholder="https://www.youtube.com/watch?v=..." autocomplete="off">
+                <button class="input-action" onclick="pasteUrl()" title="لصق">📋</button>
+                <button class="input-action" onclick="clearUrl()" title="مسح">❌</button>
+              </div>
+              <span class="input-hint">يدعم: youtube.com, youtu.be, shorts, embed</span>
+            </div>
+            <div class="input-group">
+              <label for="customNameInput">💾 اسم الملف المخصص (اختياري)</label>
+              <input type="text" id="customNameInput" placeholder="اسم الملف بدون امتداد" autocomplete="off">
+            </div>
+            <div class="form-row">
+              <div class="input-group">
+                <label for="typeSelect">🎬 نوع الملف</label>
+                <select id="typeSelect" onchange="onTypeChange()">
+                  <option value="video">🎥 فيديو MP4</option>
+                  <option value="audio">🎵 صوت MP3 + صورة</option>
+                  <option value="audio_only">🔈 صوت MP3 فقط</option>
+                </select>
+              </div>
+              <div class="input-group">
+                <label for="qualitySelect">📊 الجودة</label>
+                <select id="qualitySelect">
+                  <option value="best">🏆 الأفضل</option>
+                  <option value="4k">🌟 4K (2160p)</option>
+                  <option value="1440p">⭐ 1440p</option>
+                  <option value="1080p">🔥 1080p</option>
+                  <option value="720p" selected>⚡ 720p</option>
+                  <option value="480p">💾 480p</option>
+                  <option value="360p">📱 360p</option>
+                  <option value="240p">📟 240p</option>
+                  <option value="144p">📠 144p</option>
+                </select>
+              </div>
+            </div>
+            <div class="input-group" id="audioQualityGroup" style="display:none">
+              <label for="audioQualitySelect">🎚️ جودة الصوت</label>
+              <select id="audioQualitySelect">
+                <option value="320">320 kbps (عالي)</option>
+                <option value="256">256 kbps</option>
+                <option value="192" selected>192 kbps (موصى)</option>
+                <option value="128">128 kbps</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label for="pathInput">📁 مسار الحفظ</label>
+              <div class="input-wrapper">
+                <input type="text" id="pathInput" value="/storage/emulated/0/Download" readonly>
+                <button class="input-action" onclick="showPathPicker()" title="تغيير">📂</button>
+              </div>
+            </div>
+            <div class="compression-section" id="compressionSection">
+              <div class="checkbox-row">
+                <label class="toggle-switch"><input type="checkbox" id="compressVideo" onchange="toggleCompression()"><span class="toggle-slider"></span></label>
+                <span class="toggle-label">🗜️ ضغط الفيديو بعد التنزيل</span>
+              </div>
+              <div class="compression-options" id="compressionOptions">
+                <label for="compressionSelect">مستوى الضغط:</label>
+                <select id="compressionSelect" onchange="updateCompressionInfo()">
+                  <option value="low">🟢 منخفض (جودة عالية - حجم كبير)</option>
+                  <option value="medium" selected>🟡 متوسط (موازنة)</option>
+                  <option value="high">🔴 عالي (حجم صغير - جودة أقل)</option>
+                </select>
+                <div class="compression-info">
+                  <div class="info-item"><span class="info-label">CRF:</span><span class="info-value" id="crfValue">32</span></div>
+                  <div class="info-item"><span class="info-label">Preset:</span><span class="info-value" id="presetValue">medium</span></div>
+                  <div class="info-item"><span class="info-label">تقدير الحجم:</span><span class="info-value" id="sizeEstimate">~60% من الأصلي</span></div>
+                </div>
+              </div>
+            </div>
+            <button class="btn-primary btn-large" onclick="startDownload()" id="downloadBtn">
+              <span class="btn-icon">🚀</span><span class="btn-text">بدء التنزيل</span>
+            </button>
+          </div>
+        </div>
+        <div class="card progress-card" id="progressCard" style="display:none">
+          <div class="card-header flex-between">
+            <h2>📊 التقدم الحالي</h2>
+            <span class="status-badge" id="statusBadge">⏳ انتظار</span>
+          </div>
+          <div class="progress-section">
+            <div class="video-preview" id="videoPreview">
+              <div class="preview-placeholder"><span class="preview-icon">🎬</span><span class="preview-text">جاري تحميل المعاينة...</span></div>
+            </div>
+            <div class="progress-info-bar">
+              <div class="progress-title" id="progressTitle">-</div>
+              <div class="progress-meta"><span id="progressDuration">⏱️ -</span><span id="progressSize">📊 -</span></div>
+            </div>
+            <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill" style="width:0%"><span class="progress-percent" id="progressPercent">0%</span></div></div>
+            <div class="progress-stats">
+              <div class="progress-stat"><span>⚡</span><span id="speedText">0 B/s</span></div>
+              <div class="progress-stat"><span>⏱️</span><span id="etaText">00:00</span></div>
+              <div class="progress-stat"><span>📦</span><span id="downloadedText">0 MB / 0 MB</span></div>
+            </div>
+            <div class="progress-actions">
+              <button class="btn-secondary" onclick="cancelCurrentTask()" id="cancelBtn"><span>⛔ إلغاء</span></button>
+            </div>
+          </div>
+          <div class="completed-files" id="completedFiles">
+            <h3>📁 الملفات المكتملة</h3>
+            <div class="files-list" id="filesList"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card quick-paths-card">
+        <h3 class="section-title">📂 مسارات سريعة</h3>
+        <div class="quick-paths">
+          <button class="path-chip" onclick="setPath('/storage/emulated/0/Download')"><span>📥</span> Download</button>
+          <button class="path-chip" onclick="setPath('/storage/emulated/0/Music')"><span>🎵</span> Music</button>
+          <button class="path-chip" onclick="setPath('/storage/emulated/0/Movies')"><span>🎬</span> Movies</button>
+          <button class="path-chip" onclick="setPath('/storage/emulated/0/DCIM/Camera')"><span>📷</span> Camera</button>
+          <button class="path-chip" onclick="setPath('/storage/emulated/0/Documents')"><span>📄</span> Documents</button>
+          <button class="path-chip" onclick="setPath('/storage/emulated/0/Videos')"><span>🎞️</span> Videos</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tasks Tab -->
+    <div class="tab-content" id="tasks-tab">
+      <div class="card">
+        <div class="card-header flex-between">
+          <h2>📋 قائمة المهام</h2>
+          <div class="header-actions-group">
+            <button class="btn-icon-btn" onclick="refreshTasks()" title="تحديث">🔄</button>
+            <button class="btn-icon-btn danger" onclick="cancelAllTasks()" title="إلغاء الكل">⛔</button>
+            <button class="btn-icon-btn" onclick="clearCompleted()" title="مسح المكتمل">🧹</button>
+          </div>
+        </div>
+        <div class="tasks-filter">
+          <button class="filter-btn active" data-filter="all" onclick="filterTasks('all')">الكل</button>
+          <button class="filter-btn" data-filter="active" onclick="filterTasks('active')">نشط</button>
+          <button class="filter-btn" data-filter="completed" onclick="filterTasks('completed')">مكتمل</button>
+          <button class="filter-btn" data-filter="error" onclick="filterTasks('error')">خطأ</button>
+        </div>
+        <div class="tasks-container" id="tasksContainer">
+          <div class="empty-state">
+            <div class="empty-icon">📭</div>
+            <div class="empty-title">لا توجد مهام</div>
+            <div class="empty-desc">ابدأ بتنزيل فيديو جديد من تبويب التنزيل</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- History Tab -->
+    <div class="tab-content" id="history-tab">
+      <div class="card">
+        <div class="card-header flex-between">
+          <h2>📜 سجل التنزيلات</h2>
+          <button class="btn-icon-btn danger" onclick="clearHistory()" title="مسح السجل">🗑️</button>
+        </div>
+        <div class="history-container" id="historyContainer">
+          <div class="empty-state">
+            <div class="empty-icon">📜</div>
+            <div class="empty-title">السجل فارغ</div>
+            <div class="empty-desc">ستظهر هنا التنزيلات المكتملة</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Tab -->
+    <div class="tab-content" id="settings-tab">
+      <div class="content-grid">
+        <div class="card">
+          <div class="card-header"><h2>⚙️ الإعدادات العامة</h2></div>
+          <div class="settings-section">
+            <div class="setting-item">
+              <div class="setting-info"><span class="setting-label">🌓 المظهر</span><span class="setting-desc">اختر بين الوضع الليلي والنهاري</span></div>
+              <div class="theme-selector">
+                <button class="theme-option" data-theme="dark" onclick="setTheme('dark')"><span>🌙</span><span>ليلي</span></button>
+                <button class="theme-option" data-theme="light" onclick="setTheme('light')"><span>☀️</span><span>نهاري</span></button>
+                <button class="theme-option" data-theme="auto" onclick="setTheme('auto')"><span>🔄</span><span>تلقائي</span></button>
+              </div>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info"><span class="setting-label">📁 مسار التحميل الافتراضي</span><span class="setting-desc">المسار الذي سيتم حفظ الملفات فيه</span></div>
+              <div class="input-wrapper">
+                <input type="text" id="defaultPath" value="/storage/emulated/0/Download">
+                <button class="input-action" onclick="showPathPicker()">📂</button>
+              </div>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info"><span class="setting-label">⚡ التنزيلات المتزامنة</span><span class="setting-desc">عدد التنزيلات المتزامنة (1-10)</span></div>
+              <div class="range-input">
+                <input type="range" id="maxConcurrent" min="1" max="10" value="3" oninput="updateRangeValue(this)">
+                <span class="range-value" id="maxConcurrentValue">3</span>
+              </div>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info"><span class="setting-label">🔔 الإشعارات</span><span class="setting-desc">إظهار إشعارات عند اكتمال التنزيل</span></div>
+              <label class="toggle-switch"><input type="checkbox" id="notifications" checked><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+          <button class="btn-primary" onclick="saveSettings()" style="margin-top:16px"><span>💾 حفظ الإعدادات</span></button>
+        </div>
+        <div class="card">
+          <div class="card-header"><h2>📊 معلومات النظام</h2></div>
+          <div class="info-section">
+            <div class="info-item"><span class="info-label">الإصدار:</span><span class="info-value">2.0 APK</span></div>
+            <div class="info-item"><span class="info-label">yt-dlp:</span><span class="info-value" id="ytDlpStatus">جاري الفحص...</span></div>
+            <div class="info-item"><span class="info-label">FFmpeg:</span><span class="info-value" id="ffmpegStatus">جاري الفحص...</span></div>
+            <div class="info-item"><span class="info-label">المساحة المتاحة:</span><span class="info-value" id="diskFree">-</span></div>
+            <div class="info-item"><span class="info-label">Android:</span><span class="info-value" id="androidVersion">-</span></div>
+          </div>
+          <div class="system-actions">
+            <button class="btn-secondary" onclick="checkSystem()"><span>🔍 فحص النظام</span></button>
+            <button class="btn-secondary" onclick="updateYtDlp()"><span>⬆️ تحديث yt-dlp</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header"><h3 id="modalTitle">عنوان</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer" id="modalFooter"></div>
+  </div>
+</div>
+
+<!-- Path Picker Modal -->
+<div class="modal-overlay" id="pathPickerModal">
+  <div class="modal modal-large">
+    <div class="modal-header"><h3>📂 اختيار المسار</h3><button class="modal-close" onclick="closePathPicker()">✕</button></div>
+    <div class="modal-body">
+      <div class="path-breadcrumb" id="pathBreadcrumb">/storage/emulated/0</div>
+      <div class="path-list" id="pathList"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closePathPicker()">إلغاء</button>
+      <button class="btn-primary" onclick="confirmPath()">تأكيد</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════
+   YouTube Downloader Pro - APK Edition
+   Android WebView JavaScript Interface
+   ════════════════════════════════════════════ */
+
+const CONFIG={REFRESH_INTERVAL:1500,TOAST_DURATION:4000};
+const state={currentTaskId:null,currentTab:'download',tasksFilter:'all',refreshInterval:null,isSidebarCollapsed:false,settings:{theme:'dark',downloadPath:'/storage/emulated/0/Download',maxConcurrent:3,notifications:true,compressVideo:false,compressionLevel:'medium'},tasks:[],hasYtDlp:false,hasFfmpeg:false};
+
+/* ════════════════════════════════════════════
+   Android JavaScript Interface (JS Bridge)
+   ════════════════════════════════════════════ */
+
+const Android = window.Android || {
+  // Fallback for browser testing
+  downloadVideo: function(url, path, options) {
+    console.log('Android.downloadVideo:', url, path, options);
+    return JSON.stringify({success:true,taskId:'test-'+Date.now()});
+  },
+  cancelDownload: function(taskId) {
+    console.log('Android.cancelDownload:', taskId);
+    return JSON.stringify({success:true});
+  },
+  getProgress: function(taskId) {
+    console.log('Android.getProgress:', taskId);
+    return JSON.stringify({status:'downloading',percent:50,speed:'2.5 MB/s',eta:'01:30',title:'Test Video',filesize:'100 MB',duration:300});
+  },
+  getAllTasks: function() {
+    return JSON.stringify([]);
+  },
+  checkYtDlp: function() {
+    return JSON.stringify({installed:false,version:'',path:''});
+  },
+  checkFfmpeg: function() {
+    return JSON.stringify({installed:false,version:''});
+  },
+  getDiskFree: function() {
+    return JSON.stringify({free:'0 B',total:'0 B'});
+  },
+  getAndroidVersion: function() {
+    return JSON.stringify({version:'Unknown',sdk:0});
+  },
+  updateYtDlp: function() {
+    return JSON.stringify({success:false,message:'Not implemented in browser'});
+  },
+  openFile: function(path) {
+    console.log('Android.openFile:', path);
+  },
+  showToast: function(message) {
+    console.log('Android Toast:', message);
+  },
+  saveSettings: function(settings) {
+    console.log('Android.saveSettings:', settings);
+  },
+  loadSettings: function() {
+    return JSON.stringify({});
+  },
+  clearHistory: function() {
+    return JSON.stringify({success:true});
+  }
+};
+
+/* ════════════════════════════════════════════
+   Toast Manager
+   ════════════════════════════════════════════ */
+
+class ToastManager{
+  static container=document.getElementById('toastContainer');
+  static show(message,type='info',title=''){
+    const icons={success:'✅',error:'❌',warning:'⚠️',info:'ℹ️'};
+    const titles={success:'نجاح',error:'خطأ',warning:'تنبيه',info:'معلومة'};
+    const toast=document.createElement('div');
+    toast.className=`toast toast-${type}`;
+    toast.innerHTML=`<span class="toast-icon">${icons[type]}</span><div class="toast-content"><div class="toast-title">${title||titles[type]}</div><div class="toast-message">${message}</div></div><button class="toast-close" onclick="ToastManager.dismiss(this)">✕</button>`;
+    this.container.appendChild(toast);
+    setTimeout(()=>{if(toast.parentNode)this.dismiss(toast.querySelector('.toast-close'))},CONFIG.TOAST_DURATION);
+    return toast;
+  }
+  static dismiss(button){const toast=button.closest('.toast');toast.classList.add('removing');setTimeout(()=>{if(toast.parentNode)toast.parentNode.removeChild(toast)},300)}
+  static success(m,t){return this.show(m,'success',t)}
+  static error(m,t){return this.show(m,'error',t)}
+  static warning(m,t){return this.show(m,'warning',t)}
+  static info(m,t){return this.show(m,'info',t)}
+}
+
+/* ════════════════════════════════════════════
+   Modal Manager
+   ════════════════════════════════════════════ */
+
+class ModalManager{
+  static show(title,content,footer=''){
+    document.getElementById('modalTitle').textContent=title;
+    document.getElementById('modalBody').innerHTML=content;
+    document.getElementById('modalFooter').innerHTML=footer;
+    document.getElementById('modalOverlay').classList.add('active');
+    document.body.style.overflow='hidden';
+  }
+  static close(){document.getElementById('modalOverlay').classList.remove('active');document.body.style.overflow=''}
+}
+
+/* ════════════════════════════════════════════
+   Path Picker
+   ════════════════════════════════════════════ */
+
+class PathPicker{
+  static currentPath='/storage/emulated/0';
+  static onConfirm=null;
+  static open(cb){this.onConfirm=cb;this.currentPath='/storage/emulated/0';this.refreshList();document.getElementById('pathPickerModal').classList.add('active')}
+  static close(){document.getElementById('pathPickerModal').classList.remove('active')}
+  static refreshList(){
+    const paths=[{name:'Download',icon:'📥',path:'/storage/emulated/0/Download'},{name:'Music',icon:'🎵',path:'/storage/emulated/0/Music'},{name:'Movies',icon:'🎬',path:'/storage/emulated/0/Movies'},{name:'DCIM',icon:'📷',path:'/storage/emulated/0/DCIM'},{name:'Documents',icon:'📄',path:'/storage/emulated/0/Documents'},{name:'Videos',icon:'🎞️',path:'/storage/emulated/0/Videos'},{name:'Pictures',icon:'🖼️',path:'/storage/emulated/0/Pictures'},{name:'Termux',icon:'📱',path:'/data/data/com.termux/files/home'}];
+    document.getElementById('pathBreadcrumb').textContent=this.currentPath;
+    document.getElementById('pathList').innerHTML=paths.map(p=>`<div class="path-item" onclick="PathPicker.selectPath('${p.path}')"><span class="path-item-icon">${p.icon}</span><span>${p.name}</span><span style="margin-right:auto;color:var(--text-muted);font-size:.75rem">${p.path}</span></div>`).join('');
+  }
+  static selectPath(path){this.currentPath=path;document.getElementById('pathBreadcrumb').textContent=path}
+  static confirm(){if(this.onConfirm)this.onConfirm(this.currentPath);this.close()}
+}
+
+/* ════════════════════════════════════════════
+   Theme Manager
+   ════════════════════════════════════════════ */
+
+class ThemeManager{
+  static init(){const saved=localStorage.getItem('theme')||'dark';this.set(saved)}
+  static set(theme){
+    state.settings.theme=theme;
+    if(theme==='auto'){const prefersDark=window.matchMedia('(prefers-color-scheme:dark)').matches;document.body.setAttribute('data-theme',prefersDark?'dark':'light')}
+    else document.body.setAttribute('data-theme',theme);
+    localStorage.setItem('theme',theme);
+    document.querySelectorAll('.theme-option').forEach(btn=>btn.classList.toggle('active',btn.dataset.theme===theme));
+    document.getElementById('themeIcon').textContent=theme==='light'?'☀️':'🌙';
+  }
+  static toggle(){const next=state.settings.theme==='dark'?'light':'dark';this.set(next);ToastManager.info(`تم تبديل المظهر إلى الوضع ${next==='dark'?'الليلي':'النهاري'}`)}
+}
+
+/* ════════════════════════════════════════════
+   Task Manager
+   ════════════════════════════════════════════ */
+
+class TaskManager{
+  static refresh(){
+    try{
+      const result=JSON.parse(Android.getAllTasks());
+      state.tasks=Array.isArray(result)?result:[];
+      this.render();
+      this.updateBadge();
+    }catch(e){console.error('Error refreshing tasks:',e)}
+  }
+  static render(){
+    const container=document.getElementById('tasksContainer');
+    const filtered=this.getFilteredTasks();
+    if(filtered.length===0){container.innerHTML=`<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">لا توجد مهام ${state.tasksFilter!=='all'?'في هذا التصنيف':''}</div><div class="empty-desc">ابدأ بتنزيل فيديو جديد من تبويب التنزيل</div></div>`;return}
+    container.innerHTML=filtered.map(t=>this.createTaskCard(t)).join('');
+  }
+  static getFilteredTasks(){switch(state.tasksFilter){case'active':return state.tasks.filter(t=>['pending','downloading','processing','compressing','waiting'].includes(t.status));case'completed':return state.tasks.filter(t=>t.status==='completed');case'error':return state.tasks.filter(t=>['error','cancelled'].includes(t.status));default:return state.tasks}}
+  static createTaskCard(task){
+    const cfg={pending:{text:'⏳ انتظار',cls:'status-pending'},downloading:{text:'⬇️ تنزيل',cls:'status-downloading'},processing:{text:'⚙️ معالجة',cls:'status-processing'},compressing:{text:'🗜️ ضغط',cls:'status-compressing'},completed:{text:'✅ مكتمل',cls:'status-completed'},error:{text:'❌ خطأ',cls:'status-error'},cancelled:{text:'⛔ ملغي',cls:'status-cancelled'},waiting:{text:'⏱️ قائمة',cls:'status-pending'}};
+    const s=cfg[task.status]||cfg.pending;
+    const canCancel=['pending','downloading','waiting'].includes(task.status);
+    const hasFiles=task.files&&task.files.length>0;
+    return `<div class="task-card ${s.cls}" id="task-${task.id}"><div class="task-header"><div class="task-title" title="${task.title||task.url}">${task.title||task.url}</div><span class="status-badge ${s.cls}">${s.text}</span></div><div class="task-meta"><span>${task.type==='video'?'🎥 فيديو':'🎵 صوت'}</span><span>📊 ${task.filesize||'0 B'}</span><span>⏱️ ${task.created_at?new Date(task.created_at).toLocaleTimeString('ar-SA'):'-'}</span>${task.quality?`<span>📊 ${task.quality}</span>`:''}</div>${task.percent>0?`<div class="task-progress"><div class="task-progress-bar"><div class="task-progress-fill" style="width:${task.percent}%"></div></div><div class="task-progress-info"><span>${task.percent}%</span><span>${task.speed||'0 B/s'}</span><span>متبقي: ${task.eta||'00:00'}</span></div></div>`:''}<div class="task-actions">${canCancel?`<button class="task-btn danger" onclick="TaskManager.cancel('${task.id}')">⛔ إلغاء</button>`:''}${hasFiles?`<button class="task-btn" onclick="TaskManager.openFile('${task.files[0].path}')">📂 فتح</button>`:''}${task.status==='error'?`<button class="task-btn" onclick="TaskManager.retry('${task.id}')">🔄 إعادة</button>`:''}</div>${hasFiles?`<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">${task.files.map(f=>`<div style="font-size:.8rem;color:var(--text-muted);display:flex;align-items:center;gap:6px"><span>📄</span><span style="overflow:hidden;text-overflow:ellipsis">${f.name}</span><span style="margin-right:auto">${f.size}</span></div>`).join('')}</div>`:''}</div>`;
+  }
+  static updateBadge(){const active=state.tasks.filter(t=>['pending','downloading','processing','compressing','waiting'].includes(t.status)).length;const badge=document.getElementById('tasksBadge');badge.textContent=active;badge.classList.toggle('show',active>0)}
+  static cancel(id){if(!confirm('هل أنت متأكد من إلغاء هذه المهمة؟'))return;try{const r=JSON.parse(Android.cancelDownload(id));if(r.success){ToastManager.success('تم إلغاء المهمة');this.refresh()}else ToastManager.error(r.message||'فشل')}catch(e){ToastManager.error('خطأ في الإلغاء')}}
+  static cancelAll(){if(!confirm('هل أنت متأكد من إلغاء جميع المهام النشطة؟'))return;state.tasks.forEach(t=>{if(['pending','downloading','waiting'].includes(t.status))try{Android.cancelDownload(t.id)}catch(e){}});setTimeout(()=>this.refresh(),500);ToastManager.success('تم إلغاء المهام')}
+  static openFile(path){try{Android.openFile(path);ToastManager.info('جاري فتح الملف...')}catch(e){ToastManager.error('لا يمكن فتح الملف')}}
+  static retry(id){const task=state.tasks.find(t=>t.id===id);if(!task)return;DownloadManager.start({url:task.url,path:task.path,type:task.type,quality:task.quality,audio_quality:task.audio_quality,custom_name:task.custom_name,compress:task.compress,compression_level:task.compression_level})}
+  static clearCompleted(){ToastManager.info('سيتم مسح المهام المكتملة تلقائياً')}
+}
+
+/* ════════════════════════════════════════════
+   Download Manager
+   ════════════════════════════════════════════ */
+
+class DownloadManager{
+  static start(params=null){
+    if(!state.hasYtDlp){ToastManager.error('yt-dlp غير مثبت! اذهب للإعدادات وفحص النظام','❌');return false}
+    const data=params||{url:document.getElementById('urlInput').value.trim(),path:document.getElementById('pathInput').value.trim(),type:document.getElementById('typeSelect').value,quality:document.getElementById('qualitySelect').value,audio_quality:document.getElementById('audioQualitySelect').value,custom_name:document.getElementById('customNameInput').value.trim(),audio_format:'mp3',compress:document.getElementById('compressVideo').checked,compression_level:document.getElementById('compressionSelect').value};
+    if(!data.url){ToastManager.error('الرجاء إدخال رابط الفيديو');return false}
+    if(!data.url.includes('youtube.com')&&!data.url.includes('youtu.be')){ToastManager.error('الرجاء إدخال رابط YouTube صالح');return false}
+    const btn=document.getElementById('downloadBtn');
+    const original=btn.innerHTML;
+    btn.innerHTML='<span class="spinner"></span><span>جاري الإرسال...</span>';btn.disabled=true;
+    try{
+      const result=JSON.parse(Android.downloadVideo(data.url,data.path,JSON.stringify(data)));
+      if(result.success){
+        state.currentTaskId=result.taskId;
+        ToastManager.success('بدأ التنزيل بنجاح!','تم');
+        document.getElementById('progressCard').style.display='block';
+        this.resetProgress();
+        if(!params){document.getElementById('urlInput').value='';document.getElementById('customNameInput').value=''}
+        this.startMonitoring();
+        return true;
+      }else{ToastManager.error(result.message||result.error||'فشل في بدء التنزيل');return false}
+    }catch(e){ToastManager.error('خطأ: '+e.message);return false}
+    finally{btn.innerHTML=original;btn.disabled=false}
+  }
+  static startMonitoring(){if(state.refreshInterval)clearInterval(state.refreshInterval);state.refreshInterval=setInterval(()=>{this.updateProgress();TaskManager.refresh();StatsManager.update()},CONFIG.REFRESH_INTERVAL)}
+  static stopMonitoring(){if(state.refreshInterval){clearInterval(state.refreshInterval);state.refreshInterval=null}}
+  static updateProgress(){if(!state.currentTaskId)return;try{const r=JSON.parse(Android.getProgress(state.currentTaskId));if(!r||r.error)return;const t=r;document.getElementById('progressFill').style.width=`${t.percent||0}%`;document.getElementById('progressPercent').textContent=`${t.percent||0}%`;document.getElementById('speedText').textContent=t.speed||'0 B/s';document.getElementById('etaText').textContent=`متبقي: ${t.eta||'00:00'}`;document.getElementById('progressTitle').textContent=t.title||'جاري التحميل...';document.getElementById('progressSize').textContent=`📊 ${t.filesize||'0 B'}`;document.getElementById('progressDuration').textContent=`⏱️ ${t.duration?formatDuration(t.duration):'-'}`;const st=document.getElementById('statusBadge');const sc={pending:'status-pending',downloading:'status-downloading',processing:'status-processing',compressing:'status-compressing',completed:'status-completed',error:'status-error',cancelled:'status-cancelled'};const stt={pending:'⏳ انتظار',downloading:'⬇️ تنزيل',processing:'⚙️ معالجة',compressing:'🗜️ ضغط',completed:'✅ مكتمل',error:'❌ خطأ',cancelled:'⛔ ملغي'};st.className=`status-badge ${sc[t.status]||'status-pending'}`;st.textContent=stt[t.status]||'⏳ انتظار';if(t.status==='completed'&&t.files&&t.files.length>0){this.showFiles(t.files);if(state.settings.notifications)ToastManager.success(`اكتمل: ${t.title||'فيديو'}`,'✅ تم');setTimeout(()=>this.stopMonitoring(),5000)}if(t.status==='error'&&t.error){ToastManager.error(t.error,'خطأ');this.stopMonitoring()}}catch(e){console.error('Progress error:',e)}}
+  static showFiles(files){const c=document.getElementById('completedFiles');const l=document.getElementById('filesList');l.innerHTML=files.map(f=>`<div class="file-item"><span class="file-icon">📄</span><div class="file-info"><div class="file-name">${f.name}</div><div class="file-meta">${f.size||'0 B'} • ${f.modified?new Date(f.modified).toLocaleString('ar-SA'):'-'}</div></div><div class="file-actions"><button class="file-btn" onclick="TaskManager.openFile('${f.path}')">📂 فتح</button></div></div>`).join('');c.style.display='block'}
+  static resetProgress(){document.getElementById('progressFill').style.width='0%';document.getElementById('progressPercent').textContent='0%';document.getElementById('speedText').textContent='0 B/s';document.getElementById('etaText').textContent='متبقي: 00:00';document.getElementById('progressTitle').textContent='-';document.getElementById('progressSize').textContent='📊 -';document.getElementById('progressDuration').textContent='⏱️ -';document.getElementById('completedFiles').style.display='none';document.getElementById('statusBadge').className='status-badge status-pending';document.getElementById('statusBadge').textContent='⏳ انتظار'}
+  static cancelCurrent(){if(!state.currentTaskId)return;if(!confirm('هل أنت متأكد من إلغاء التنزيل الحالي؟'))return;try{const r=JSON.parse(Android.cancelDownload(state.currentTaskId));if(r.success){ToastManager.success('تم إلغاء التنزيل');this.stopMonitoring();this.resetProgress();document.getElementById('progressCard').style.display='none';state.currentTaskId=null}else ToastManager.error(r.message||'فشل')}catch(e){ToastManager.error('خطأ')}}}
+
+/* ════════════════════════════════════════════
+   Stats Manager
+   ════════════════════════════════════════════ */
+
+class StatsManager{
+  static update(){const active=state.tasks.filter(t=>['downloading','processing','compressing'].includes(t.status)).length;const completed=state.tasks.filter(t=>t.status==='completed').length;const pending=state.tasks.filter(t=>['pending','waiting'].includes(t.status)).length;document.getElementById('activeCount').textContent=active;document.getElementById('completedCount').textContent=completed;document.getElementById('queueCount').textContent=pending;document.getElementById('totalCount').textContent=state.tasks.length}
+}
+
+/* ════════════════════════════════════════════
+   Settings Manager
+   ════════════════════════════════════════════ */
+
+class SettingsManager{
+  static init(){const saved=localStorage.getItem('yt_apk_settings');if(saved){try{state.settings={...state.settings,...JSON.parse(saved)}}catch(e){console.error(e)}}this.applyToUI()}
+  static applyToUI(){document.getElementById('defaultPath').value=state.settings.downloadPath;document.getElementById('pathInput').value=state.settings.downloadPath;document.getElementById('maxConcurrent').value=state.settings.maxConcurrent;document.getElementById('maxConcurrentValue').textContent=state.settings.maxConcurrent;document.getElementById('notifications').checked=state.settings.notifications;document.getElementById('compressVideo').checked=state.settings.compressVideo;document.getElementById('compressionSelect').value=state.settings.compressionLevel;ThemeManager.set(state.settings.theme);toggleCompression()}
+  static save(){state.settings.downloadPath=document.getElementById('defaultPath').value;state.settings.maxConcurrent=parseInt(document.getElementById('maxConcurrent').value);state.settings.notifications=document.getElementById('notifications').checked;state.settings.compressVideo=document.getElementById('compressVideo').checked;state.settings.compressionLevel=document.getElementById('compressionSelect').value;localStorage.setItem('yt_apk_settings',JSON.stringify(state.settings));try{Android.saveSettings(JSON.stringify(state.settings))}catch(e){}ToastManager.success('تم حفظ الإعدادات')}
+  static loadFromAndroid(){try{const s=Android.loadSettings();if(s){const d=JSON.parse(s);if(d.downloadPath)state.settings.downloadPath=d.downloadPath;if(d.theme)state.settings.theme=d.theme;if(d.compressVideo!==undefined)state.settings.compressVideo=d.compressVideo;if(d.compressionLevel)state.settings.compressionLevel=d.compressionLevel;this.applyToUI()}}catch(e){console.log('No Android settings found')}}
+}
+
+/* ════════════════════════════════════════════
+   System Manager
+   ════════════════════════════════════════════ */
+
+class SystemManager{
+  static checkSystem(){
+    try{
+      const yt=JSON.parse(Android.checkYtDlp());
+      state.hasYtDlp=yt.installed;
+      document.getElementById('ytDlpStatus').textContent=yt.installed?`✅ ${yt.version}`:'❌ غير مثبت';
+      const ff=JSON.parse(Android.checkFfmpeg());
+      state.hasFfmpeg=ff.installed;
+      document.getElementById('ffmpegStatus').textContent=ff.installed?`✅ ${ff.version}`:'❌ غير مثبت';
+      const disk=JSON.parse(Android.getDiskFree());
+      document.getElementById('diskFree').textContent=disk.free||'-';
+      const android=JSON.parse(Android.getAndroidVersion());
+      document.getElementById('androidVersion').textContent=android.version||'-';
+      const apkStatus=document.getElementById('apkStatus');
+      const serverDot=document.getElementById('serverStatus');
+      if(yt.installed){apkStatus.textContent='yt-dlp جاهز للعمل ✅';serverDot.className='status-dot online'}else{apkStatus.textContent='yt-dlp غير مثبت ❌ - انقر "تحديث yt-dlp"';serverDot.className='status-dot offline'}
+      if(yt.installed)ToastManager.success('النظام جاهز!','✅');else ToastManager.warning('yt-dlp غير مثبت','⚠️');
+    }catch(e){ToastManager.error('خطأ في فحص النظام: '+e.message)}
+  }
+  static updateYtDlp(){try{const r=JSON.parse(Android.updateYtDlp());if(r.success){ToastManager.success('تم تحديث yt-dlp','✅');this.checkSystem()}else ToastManager.error(r.message||'فشل التحديث')}catch(e){ToastManager.error('خطأ في التحديث')}}
+  static clearHistory(){if(!confirm('هل أنت متأكد من مسح السجل؟'))return;try{const r=JSON.parse(Android.clearHistory());if(r.success)ToastManager.success('تم مسح السجل');else ToastManager.error('فشل')}catch(e){ToastManager.error('خطأ')}}
+}
+
+/* ════════════════════════════════════════════
+   Utility Functions
+   ════════════════════════════════════════════ */
+
+function formatDuration(s){if(!s||s<=0)return'-';const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;if(h>0)return`${h}:${m.toString().padStart(2,'0')}:${sec.toString().padStart(2,'0')}`;return`${m}:${sec.toString().padStart(2,'0')}`}
+function formatSize(b){if(!b||b===0)return'0 B';const u=['B','KB','MB','GB','TB'];let i=0;let s=parseFloat(b);while(s>=1024&&i<u.length-1){s/=1024;i++}return`${s.toFixed(2)} ${u[i]}`}
+
+/* ════════════════════════════════════════════
+   UI Event Handlers
+   ════════════════════════════════════════════ */
+
+function switchTab(tab){state.currentTab=tab;document.querySelectorAll('.nav-item').forEach(i=>i.classList.toggle('active',i.dataset.tab===tab));document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.getElementById(`${tab}-tab`).classList.add('active');const titles={download:'⬇️ تنزيل جديد',tasks:'📋 قائمة المهام',history:'📜 سجل التنزيلات',settings:'⚙️ الإعدادات'};document.getElementById('pageTitle').textContent=titles[tab]||'';if(tab==='tasks')TaskManager.refresh();if(tab==='settings')SystemManager.checkSystem()}
+function toggleSidebar(){state.isSidebarCollapsed=!state.isSidebarCollapsed;document.getElementById('sidebar').classList.toggle('collapsed',state.isSidebarCollapsed)}
+function toggleTheme(){ThemeManager.toggle()}
+function setTheme(t){ThemeManager.set(t)}
+function onTypeChange(){const type=document.getElementById('typeSelect').value;const audio=document.getElementById('audioQualityGroup');const quality=document.getElementById('qualitySelect');const comp=document.getElementById('compressionSection');if(type==='audio'||type==='audio_only'){audio.style.display='flex';quality.innerHTML='<option value="best">🏆 الأفضل</option><option value="320">320 kbps</option><option value="256">256 kbps</option><option value="192" selected>192 kbps</option><option value="128">128 kbps</option>';comp.style.display='none'}else{audio.style.display='none';quality.innerHTML='<option value="best">🏆 الأفضل</option><option value="4k">🌟 4K (2160p)</option><option value="1440p">⭐ 1440p</option><option value="1080p">🔥 1080p</option><option value="720p" selected>⚡ 720p</option><option value="480p">💾 480p</option><option value="360p">📱 360p</option><option value="240p">📟 240p</option><option value="144p">📠 144p</option>';comp.style.display='block'}}
+function toggleCompression(){const cb=document.getElementById('compressVideo');document.getElementById('compressionOptions').style.display=cb.checked?'block':'none';if(cb.checked)updateCompressionInfo()}
+function updateCompressionInfo(){const lv=document.getElementById('compressionSelect').value;const lvls={low:{crf:'28',preset:'fast',est:'~80% من الأصلي'},medium:{crf:'32',preset:'medium',est:'~60% من الأصلي'},high:{crf:'36',preset:'slow',est:'~40% من الأصلي'}};const i=lvls[lv]||lvls.medium;document.getElementById('crfValue').textContent=i.crf;document.getElementById('presetValue').textContent=i.preset;document.getElementById('sizeEstimate').textContent=i.est}
+function setPath(p){document.getElementById('pathInput').value=p;document.querySelectorAll('.path-chip').forEach(c=>c.classList.toggle('active',c.textContent.includes(p.split('/').pop())));ToastManager.info(`المسار: ${p}`)}
+function showPathPicker(){PathPicker.open(p=>{document.getElementById('pathInput').value=p;document.getElementById('defaultPath').value=p;ToastManager.info(`المسار: ${p}`)})}
+function closePathPicker(){PathPicker.close()}
+function confirmPath(){PathPicker.confirm()}
+function pasteUrl(){navigator.clipboard.readText().then(t=>{document.getElementById('urlInput').value=t;ToastManager.info('تم اللصق')}).catch(()=>ToastManager.warning('لا يمكن الوصول للحافظة'))}
+function clearUrl(){document.getElementById('urlInput').value='';document.getElementById('customNameInput').value=''}
+function startDownload(){DownloadManager.start()}
+function cancelCurrentTask(){DownloadManager.cancelCurrent()}
+function filterTasks(f){state.tasksFilter=f;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.filter===f));TaskManager.render()}
+function refreshTasks(){TaskManager.refresh();ToastManager.info('تم التحديث')}
+function cancelAllTasks(){TaskManager.cancelAll()}
+function clearCompleted(){TaskManager.clearCompleted()}
+function clearHistory(){SystemManager.clearHistory()}
+function saveSettings(){SettingsManager.save()}
+function updateRangeValue(i){document.getElementById('maxConcurrentValue').textContent=i.value}
+function checkSystem(){SystemManager.checkSystem()}
+function updateYtDlp(){SystemManager.updateYtDlp()}
+function closeModal(){ModalManager.close()}
+
+/* ════════════════════════════════════════════
+   Keyboard & Touch
+   ════════════════════════════════════════════ */
+
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==='Enter'&&state.currentTab==='download')startDownload();
+  if(e.key==='Escape'){closeModal();closePathPicker()}
+  if(e.ctrlKey||e.metaKey){const tabs=['download','tasks','history','settings'];const n=parseInt(e.key);if(n>=1&&n<=4)switchTab(tabs[n-1])}
+});
+
+document.addEventListener('DOMContentLoaded',()=>{
+  ThemeManager.init();
+  SettingsManager.init();
+  SettingsManager.loadFromAndroid();
+  SystemManager.checkSystem();
+  TaskManager.refresh();
+  StatsManager.update();
+  setInterval(()=>{TaskManager.refresh();StatsManager.update()},10000);
+  document.getElementById('compressionSelect').addEventListener('change',updateCompressionInfo);
+  document.getElementById('urlInput').addEventListener('keypress',e=>{if(e.key==='Enter')startDownload()});
+  let touchStartX=0;
+  document.addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX});
+  document.addEventListener('touchend',e=>{const diff=touchStartX-e.changedTouches[0].clientX;if(Math.abs(diff)>50){if(diff>0&&!state.isSidebarCollapsed)toggleSidebar();else if(diff<0&&state.isSidebarCollapsed)toggleSidebar()}});
+  setTimeout(()=>{if(state.hasYtDlp)ToastManager.info('مرحباً بك! ابدأ بتنزيل فيديو جديد.','👋 أهلاً');else ToastManager.warning('yt-dlp غير مثبت. اذهب للإعدادات وانقر "فحص النظام"','⚠️')},1000);
+  console.log('🎥 YT Downloader Pro APK Edition initialized');
+});
+</script>
+</body>
+</html>
