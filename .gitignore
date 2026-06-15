@@ -10,3 +10,5 @@
 local.properties
 *.apk
 *.ap_
+app/src/main/assets/ffmpeg
+app/src/main/assets/yt-dlp
